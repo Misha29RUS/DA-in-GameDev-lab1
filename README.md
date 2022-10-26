@@ -1,5 +1,6 @@
 # АНАЛИЗ ДАННЫХ И ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ [in GameDev]
-Отчет по лабораторной работе #1 выполнил(а):
+РАЗРАБОТКА СИСТЕМЫ МАШИННОГО ОБУЧЕНИЯ.
+Отчет по лабораторной работе #3 выполнил(а):
 - Пичугин Михаил Сергеевич 
 - РИ-210932
 Отметка о выполнении заданий (заполняется студентом):
@@ -35,154 +36,104 @@
 - ✨Magic ✨
 
 ## Цель работы
-Ознакомиться с основными операторами зыка Python на примере реализации линейной регрессии.
+познакомиться с программными средствами для создания системы машинного обучения и ее интеграции в Unity.
 
 ## Задание 1
-### Написать программы Hello world на Python и Unity
+### Реализовать систему машинного обучения в связке Python - Google-Sheets – Unity.
 Для взаимодейстия с Python использовался Google Colab.
 
-![Collab1](https://user-images.githubusercontent.com/114404329/192327326-840f89c6-cc97-4229-a8d7-715299bfccec.png)
-![Collab2](https://user-images.githubusercontent.com/114404329/192327333-7403293f-4219-4474-9582-f259ebdad788.png)
+```py
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.Actuators;
 
-Ход действий для выполнение задания, связанного с Unity:
-Сначала был создан новый Unity проект. В проект были добавлены куб и плоскость. К сцене был привязан скрип с выводом "Hello World!" на консоль. После выполнения скрипта было выведено сообщение в консоль "Hello World!".
+public class RollerAgent : Agent
+{
+    Rigidbody rBody;
+    // Start is called before the first frame update
+    void Start()
+    {
+        rBody = GetComponent<Rigidbody>();
+    }
 
-![Unity1](https://user-images.githubusercontent.com/114404329/192327283-4ab47208-b650-46a1-8307-b0a186da2d63.PNG)
-![unity2](https://user-images.githubusercontent.com/114404329/192327289-48009be2-0a74-4f02-a8ab-8efa992ec9e1.PNG)
-![Unity screan3](https://user-images.githubusercontent.com/114404329/192327291-a7857204-5caf-4927-a432-96916abfe79f.png)
+    public Transform Target;
+    public override void OnEpisodeBegin()
+    {
+        if (this.transform.localPosition.y < 0)
+        {
+            this.rBody.angularVelocity = Vector3.zero;
+            this.rBody.velocity = Vector3.zero;
+            this.transform.localPosition = new Vector3(0, 0.5f, 0);
+        }
+
+        Target.localPosition = new Vector3(Random.value * 8-4, 0.5f, Random.value * 8-4);
+    }
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        sensor.AddObservation(Target.localPosition);
+        sensor.AddObservation(this.transform.localPosition);
+        sensor.AddObservation(rBody.velocity.x);
+        sensor.AddObservation(rBody.velocity.z);
+    }
+    public float forceMultiplier = 10;
+    public override void OnActionReceived(ActionBuffers actionBuffers)
+    {
+        Vector3 controlSignal = Vector3.zero;
+        controlSignal.x = actionBuffers.ContinuousActions[0];
+        controlSignal.z = actionBuffers.ContinuousActions[1];
+        rBody.AddForce(controlSignal * forceMultiplier);
+
+        float distanceToTarget = Vector3.Distance(this.transform.localPosition, Target.localPosition);
+
+        if(distanceToTarget < 1.42f)
+        {
+            SetReward(1.0f);
+            EndEpisode();
+        }
+        else if (this.transform.localPosition.y < 0)
+        {
+            EndEpisode();
+        }
+    }
+}
+```
+
+```py
+behaviors:
+  RollerBall:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 10
+      buffer_size: 100
+      learning_rate: 3.0e-4
+      beta: 5.0e-4
+      epsilon: 0.2
+      lambd: 0.99
+      num_epoch: 3
+      learning_rate_schedule: linear
+    network_settings:
+      normalize: false
+      hidden_units: 128
+      num_layers: 2
+    reward_signals:
+      extrinsic:
+        gamma: 0.99
+        strength: 1.0
+    max_steps: 500000
+    time_horizon: 64
+    summary_freq: 10000
+```
 
 ## Задание 2
-### Пошагово выполнить каждый пункт раздела "ход работы" с описанием и примерами реализации задач
-Ход работы:
-- Произвести подготовку данных для работы с алгоритмом линейной регрессии. 10 видов данных были установлены случайным образом, и данные находились в линейной зависимости. Данные преобразуются в формат массива, чтобы их можно было вычислить напрямую при использовании умножения и сложения.
-
-```py
-
-In [ ]:
-#Import the required modules, numpy for calculation, and Matplotlib for drawing
-import numpy as np
-import matplotlib.pyplot as plt
-#This code is for jupyter Notebook only
-%matplotlib inline
-
-# define data, and change list to array
-x = [3,21,22,34,54,34,55,67,89,99]
-x = np.array(x)
-y = [2,22,24,65,79,82,55,130,150,199]
-y = np.array(y)
-
-#Show the effect of a scatter plot
-plt.scatter(x,y)
-
-```
-Перенёс данные в Google Colab:
-
-![0](https://user-images.githubusercontent.com/114404329/192331448-57ae7079-9b0a-48c3-969f-c786aa555b97.PNG)
-
-- Определите связанные функции. Функция модели: определяет модель линейной регрессии wx+b. Функция потерь: функция потерь среднеквадратичной ошибки. Функция оптимизации: метод градиентного спуска для нахождения частных производных w и b.
-
-Определил связь функций:
-
-Функция модели:
-
-```py
-
-def model(a, b, x):
-    return a * x + b 
-    
-```    
-
-Функция потерь:
-
-```py
-
-def lossFunction(a, b, x, y):
-    num = len(x)
-    prediction = model(a, b, x)
-    return (0.5 / num) * (np.square(prediction - y)).sum()
-
-```
-
-Функция оптимизации:
-
-```py
-
-def optimize(a, b, x, y, Lr):
-    num = len(x)
-    prediction = model(a, b, x)
-    da = (1.0 / num) * ((prediction - y) * x).sum()
-    db = (1.0 / num) * ((prediction - y).sum())
-    a = a - Lr * da
-    b = b - Lr * db
-    return a, b
-    
-```
-
-Шаг 1
-
-![1](https://user-images.githubusercontent.com/114404329/192333419-77e5df15-a1aa-4d3c-997f-a3f5e8075b38.PNG)
- 
-Шаг 2
-
-![2](https://user-images.githubusercontent.com/114404329/192333497-fef8fa0e-4bb3-4fe1-9d6d-fb5a6386395f.PNG)
-
-Шаг 3
-
-![3](https://user-images.githubusercontent.com/114404329/192333562-b807a78c-fb3d-47f8-a5aa-0ed12ab62b20.PNG)
-
-Шаг 4
-
-![4](https://user-images.githubusercontent.com/114404329/192333721-71abba83-bfce-402e-807f-e574c522888a.PNG)
-
-Шаг 5
-
-![5](https://user-images.githubusercontent.com/114404329/192333765-7fcd5556-1e3c-47e0-9e18-302e982dc966.PNG)
-
-Шаг 6
-
-![10000](https://user-images.githubusercontent.com/114404329/192333798-d80669b3-0482-4936-9aa7-a7ae7d840d24.PNG)
+### Подробно опишите каждую строку файла конфигурации нейронной сети, доступного в папке с файлами проекта по ссылке. Самостоятельно найдите информацию о компонентах Decision Requester, Behavior Parameters, добавленных на сфере.
 
 ## Задание 3
-### Должна ли величина loss стремиться к нулю при изменении исходных данных? Ответьте на вопрос, приведите пример выполнения кода, который подтверждает ваш ответ.
-
-Да, должна. Если мы увеличим количества итераций, величина loss будет стремиться к нулю.
-
-При 1 итерации, loss будет равна приблизительно 1411:
-
-![1](https://user-images.githubusercontent.com/114404329/192337406-75337c9f-c27f-4f59-8829-f8e2ef08d6ef.PNG)
-
-При 10000 итераций, loss будет равна приблизительно 189:
-
-![10000](https://user-images.githubusercontent.com/114404329/192337624-42d0a4f8-84e4-465c-a345-2ddb82a19e63.PNG)
-
-При 1000000 итераций, loss будет равна приблизительно 182:
-
-![1000000](https://user-images.githubusercontent.com/114404329/192338193-2c9b44cb-e9b9-49dd-82fb-f8a8d7c108b6.PNG)
-
-Эти примеры доказывают, что при увеличении колличества итераций, loss становится меньше, следовательно, стремится к нулю
-
-### Какова роль параметра Lr? Ответьте на вопрос, приведите пример выполнения кода, который подтверждает ваш ответ. В качестве эксперимента можете изменить значение параметра.
-
-От параметра Lr зависил угол наклона между прямой и линией горизонта. Чем больше значение Lr, тем больше угол между ними.
-(Серая линия и красная кривая на скриншотах нарисованы в графическом редакторе Paint для наглядности)
-
-При Ln = 0.00001:
-
-![0 00001](https://user-images.githubusercontent.com/114404329/192341786-9f98e7d6-6c8c-4fc2-aa03-9b2d075ef33d.png)
-
-При Ln = 0.0001:
-
-![0 0001](https://user-images.githubusercontent.com/114404329/192342456-8ce7a5e4-c3db-48f1-b823-7803a895ece8.png)
-
-При Ln = 0.001:
-
-![0 001](https://user-images.githubusercontent.com/114404329/192342494-69731086-7cf0-4bb2-9867-7234c98c1032.png)
-
+### Доработайте сцену и обучите ML-Agent таким образом, чтобы шар перемещался между двумя кубами разного цвета. Кубы должны, как и в первом задании, случайно изменять координаты на плоскости.
 
 ## Выводы
-
-В ходе данной работы я написал две простые программы на Ubity и Python(Google colab). Также по ютуб гайдам я настроил среды разработки.
-Далее, я проанализировал и реализовал код из методички, тем самым познакомившись с алгоритмом линейной регрессии и функциями модели, потерь и оптимизации. После были проведены эксперименты для выявления зависимости и закономерности.
 
 | Plugin | README |
 | ------ | ------ |
