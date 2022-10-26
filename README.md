@@ -36,13 +36,26 @@
 - ✨Magic ✨
 
 ## Цель работы
-познакомиться с программными средствами для создания системы машинного обучения и ее интеграции в Unity.
+Познакомиться с программными средствами для создания системы машинного обучения и ее интеграции в Unity.
 
 ## Задание 1
 ### Реализовать систему машинного обучения в связке Python - Google-Sheets – Unity.
-Для взаимодейстия с Python использовался Google Colab.
 
-```С#
+1. Создал новый 3D проект в Unity и добавил ML Agent.
+
+![1](https://user-images.githubusercontent.com/114404329/198079987-90343c66-5809-4ec6-88fc-a42637c98484.png)
+
+2. Скачал необходимые компаненты (mlagents 0.28.0 и torch 1.7.1)
+
+![Снимок](https://user-images.githubusercontent.com/114404329/198080073-c7054e17-9ff4-4689-af41-833ad1a93ad5.PNG)
+
+3.Создал и перекрасил куб,шар. Также добавил проскость. После объединил их в группу.
+
+![3](https://user-images.githubusercontent.com/114404329/198080094-a65b5ae9-5b31-488a-80fa-7521cdbb9afb.PNG)
+
+4.Добавил код в скрипт RollerAgent
+
+```cs
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -101,6 +114,14 @@ public class RollerAgent : Agent
 }
 ```
 
+![4](https://user-images.githubusercontent.com/114404329/198080107-f09007eb-40f5-4a02-9cfc-f42ca2514787.PNG)
+
+5.Добавил Decision Requester, Behavior Parameters к шару
+
+![4 1](https://user-images.githubusercontent.com/114404329/198082981-2aedec89-9c7e-4104-94af-8c71be1d98a9.PNG)
+
+6. Добавил в проект файл с конфигурациями. В него поместил следующий код:
+
 ```py
 behaviors:
   RollerBall:
@@ -126,6 +147,32 @@ behaviors:
     time_horizon: 64
     summary_freq: 10000
 ```
+
+![5](https://user-images.githubusercontent.com/114404329/198080122-0f1e0aee-4b43-4e2d-b9fa-60a372205f66.PNG)
+
+7.Начал обучение моделе на примере одной копии модели «Плоскость-Сфера-Куб»
+
+![6](https://user-images.githubusercontent.com/114404329/198080133-a64e106b-a79b-4ca1-a11d-c25097798b90.PNG)
+
+![7](https://user-images.githubusercontent.com/114404329/198080326-daadbaba-0d58-415f-a91a-7cae734b356a.PNG)
+
+8. Продолжил обучение с 9 копиями модели «Плоскость-Сфера-Куб»
+
+![8 1](https://user-images.githubusercontent.com/114404329/198080340-08a56b25-c0a5-465a-8c6a-eff559c015ed.PNG)
+
+9. Увеличил колличество копий модели «Плоскость-Сфера-Куб» до 36
+
+![9](https://user-images.githubusercontent.com/114404329/198080350-2cf284b6-ed85-4590-bc5c-eb2f39e0f257.PNG)
+
+10.Проверил работу обученной модели
+
+![10](https://user-images.githubusercontent.com/114404329/198080365-3a6f427c-43c8-4687-9075-e3b4d3f12ee2.PNG)
+
+
+
+https://user-images.githubusercontent.com/114404329/198095647-49889671-78ce-4167-81cb-e6e7f1c1b0d7.mp4
+
+
 
 ## Задание 2
 ### Подробно опишите каждую строку файла конфигурации нейронной сети, доступного в папке с файлами проекта по ссылке. Самостоятельно найдите информацию о компонентах Decision Requester, Behavior Parameters, добавленных на сфере.
