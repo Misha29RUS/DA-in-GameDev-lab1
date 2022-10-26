@@ -122,7 +122,7 @@ public class RollerAgent : Agent
 
 6. Добавил в проект файл с конфигурациями. В него поместил следующий код:
 
-```py
+```yaml
 behaviors:
   RollerBall:
     trainer_type: ppo
