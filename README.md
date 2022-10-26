@@ -42,7 +42,7 @@
 ### Реализовать систему машинного обучения в связке Python - Google-Sheets – Unity.
 Для взаимодейстия с Python использовался Google Colab.
 
-```py
+```С#
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
