@@ -296,7 +296,8 @@ public class RollerAgent : Agent
 
 6.Проверил работу обученной модели
 
-![3 5](https://user-images.githubusercontent.com/114404329/198279803-b0fa6c4d-ebdf-4a37-9d22-9a7a441ff846.PNG)
+![4 5](https://user-images.githubusercontent.com/114404329/198281546-48411e59-cebf-4743-936e-82d176067848.PNG)
+
 
 
 https://user-images.githubusercontent.com/114404329/198279679-8f0eec6e-5e41-4c3e-afa5-38a544d8588c.mp4
