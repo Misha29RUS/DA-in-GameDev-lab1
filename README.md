@@ -284,11 +284,22 @@ public class RollerAgent : Agent
 
 3. Сделал добавленный куб ещё одним таргетом
 
-![3 2](https://user-images.githubusercontent.com/114404329/198103952-2fead1dd-3030-4662-8a86-71c09a3ff9ba.PNG)
+![3 2](https://user-images.githubusercontent.com/114404329/198279771-88e4b867-143f-4482-837c-68ba61b34ab8.PNG)
 
-4.
+4.Начал обучение на одной системе «Плоскость-Сфера-Куб-Куб»
+
+![3 3](https://user-images.githubusercontent.com/114404329/198279787-eeacd64b-805f-4d84-b558-730759498c0e.PNG)
+
+5.Продолжил обучение на 9-ти системах «Плоскость-Сфера-Куб-Куб»
+
+![3 4](https://user-images.githubusercontent.com/114404329/198279798-8bd2e3ce-cf37-4e51-92d0-a8af47ad1193.PNG)
+
+6.Проверил работу обученной модели
+
+![3 5](https://user-images.githubusercontent.com/114404329/198279803-b0fa6c4d-ebdf-4a37-9d22-9a7a441ff846.PNG)
 
 
+https://user-images.githubusercontent.com/114404329/198279679-8f0eec6e-5e41-4c3e-afa5-38a544d8588c.mp4
 
 
 ## Выводы
