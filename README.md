@@ -1,5 +1,5 @@
 # АНАЛИЗ ДАННЫХ И ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ [in GameDev]
-Отчет по лабораторной работе #1 выполнил(а):
+Отчет по лабораторной работе #4 выполнил(а):
 - Пичугин Михаил Сергеевич 
 - РИ-210932
 Отметка о выполнении заданий (заполняется студентом):
@@ -35,21 +35,290 @@
 - ✨Magic ✨
 
 ## Цель работы
-Ознакомиться с основными операторами зыка Python на примере реализации линейной регрессии.
+Ознакомиться с основным устройством перцептрона, применив полученные на лекции данные на практике.
 
 ## Задание 1
-### Написать программы Hello world на Python и Unity
-Для взаимодейстия с Python использовался Google Colab.
+### Реализовать перцептрон, который будет выполнять вычисления следующих логических операторов:
+1.or
+2.and
+3.nand
+4.xor
 
-![Collab1](https://user-images.githubusercontent.com/114404329/192327326-840f89c6-cc97-4229-a8d7-715299bfccec.png)
-![Collab2](https://user-images.githubusercontent.com/114404329/192327333-7403293f-4219-4474-9582-f259ebdad788.png)
+Первым делом создал новый проект в Unity, создал объект Empty, переименовал его в Perceptron и применил к нему скрипт:
 
-Ход действий для выполнение задания, связанного с Unity:
-Сначала был создан новый Unity проект. В проект были добавлены куб и плоскость. К сцене был привязан скрип с выводом "Hello World!" на консоль. После выполнения скрипта было выведено сообщение в консоль "Hello World!".
+```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-![Unity1](https://user-images.githubusercontent.com/114404329/192327283-4ab47208-b650-46a1-8307-b0a186da2d63.PNG)
-![unity2](https://user-images.githubusercontent.com/114404329/192327289-48009be2-0a74-4f02-a8ab-8efa992ec9e1.PNG)
-![Unity screan3](https://user-images.githubusercontent.com/114404329/192327291-a7857204-5caf-4927-a432-96916abfe79f.png)
+[System.Serializable]
+public class TrainingSet
+{
+	public double[] input;
+	public double output;
+}
+
+public class Perceptron : MonoBehaviour {
+
+	public TrainingSet[] ts;
+	double[] weights = {0,0};
+	double bias = 0;
+	double totalError = 0;
+
+	double DotProductBias(double[] v1, double[] v2) 
+	{
+		if (v1 == null || v2 == null)
+			return -1;
+	 
+		if (v1.Length != v2.Length)
+			return -1;
+	 
+		double d = 0;
+		for (int x = 0; x < v1.Length; x++)
+		{
+			d += v1[x] * v2[x];
+		}
+
+		d += bias;
+	 
+		return d;
+	}
+
+	double CalcOutput(int i)
+	{
+		double dp = DotProductBias(weights,ts[i].input);
+		if(dp > 0) return(1);
+		return (0);
+	}
+
+	void InitialiseWeights()
+	{
+		for(int i = 0; i < weights.Length; i++)
+		{
+			weights[i] = Random.Range(-1.0f,1.0f);
+		}
+		bias = Random.Range(-1.0f,1.0f);
+	}
+
+	void UpdateWeights(int j)
+	{
+		double error = ts[j].output - CalcOutput(j);
+		totalError += Mathf.Abs((float)error);
+		for(int i = 0; i < weights.Length; i++)
+		{			
+			weights[i] = weights[i] + error*ts[j].input[i]; 
+		}
+		bias += error;
+	}
+
+	double CalcOutput(double i1, double i2)
+	{
+		double[] inp = new double[] {i1, i2};
+		double dp = DotProductBias(weights,inp);
+		if(dp > 0) return(1);
+		return (0);
+	}
+
+	void Train(int epochs)
+	{
+		InitialiseWeights();
+		
+		for(int e = 0; e < epochs; e++)
+		{
+			totalError = 0;
+			for(int t = 0; t < ts.Length; t++)
+			{
+				UpdateWeights(t);
+				Debug.Log("W1: " + (weights[0]) + " W2: " + (weights[1]) + " B: " + bias);
+			}
+			Debug.Log("TOTAL ERROR: " + totalError);
+		}
+	}
+
+	void Start () {
+		Train(8);
+		Debug.Log("Test 0 0: " + CalcOutput(0,0));
+		Debug.Log("Test 0 1: " + CalcOutput(0,1));
+		Debug.Log("Test 1 0: " + CalcOutput(1,0));
+		Debug.Log("Test 1 1: " + CalcOutput(1,1));		
+	}
+	
+	void Update () {
+		
+	}
+}
+
+```
+
+![4](https://user-images.githubusercontent.com/114404329/204625715-753bfbb3-8385-46c2-bc2c-9042dcd9a5f2.PNG)
+
+Далее поэтапно начал реализовывать логические операторы 
+
+#### or 
+
+Заполнил данными 
+
+![or 1 0](https://user-images.githubusercontent.com/114404329/204626403-b4b763e2-bad1-4071-87ac-de66e1b2a507.PNG)
+
+Результат
+
+![Or 1 1 (на 3 эпохе)](https://user-images.githubusercontent.com/114404329/204626465-68f750bc-ad8a-43b3-86e4-e9b26f2fe88f.PNG)
+
+![or 1 2](https://user-images.githubusercontent.com/114404329/204626491-aae7037e-a240-4668-8a03-be3bc0009353.PNG)
+
+Перцептрон обучился на 3 эпохе, выдав правильное значение. Работает корректно.
+
+#### and 
+
+Заполнил данными 
+
+![and 1 0](https://user-images.githubusercontent.com/114404329/204627424-a02bfcd2-b0b4-4631-a297-0387e9d81998.PNG)
+
+Результат
+
+![and 1 1(На 6 эпохе)](https://user-images.githubusercontent.com/114404329/204627497-7aafc60f-3158-47b0-ada6-48d196fae8f6.PNG)
+
+![and 1 2](https://user-images.githubusercontent.com/114404329/204627529-c267a04e-bdcd-4d78-b631-353f1633cde6.PNG)
+
+Перцептрон обучился на 6 эпохе, выдав правильное значение. Работает корректно.
+
+#### nand
+
+Заполнил данными 
+
+![NAND 3 0](https://user-images.githubusercontent.com/114404329/204628837-d766d306-7d93-4bc8-8798-05ed8bf7860a.PNG)
+
+
+Результат
+
+![NAND 3 1](https://user-images.githubusercontent.com/114404329/204628891-0794468f-4b45-4f54-98fa-f34532469c12.PNG)
+
+![NAND 3 2(6 эпоха)](https://user-images.githubusercontent.com/114404329/204628911-d435a3ab-d0a7-4dbc-bff1-02f02c6bd8ae.PNG)
+
+
+Перцептрон обучился на 6 эпохе, выдав правильное значение. Работает корректно.
+
+#### xor
+
+Заполнил данными 
+
+![XOR 4 0](https://user-images.githubusercontent.com/114404329/204628972-fb69c560-f711-4299-b7f5-51124a0b1990.PNG)
+
+Результат
+
+![XOR 4 1(не учится)](https://user-images.githubusercontent.com/114404329/204628991-9503ec3a-0dce-449f-abec-a0c9a044cd6d.PNG)
+
+Перцептрон не обучился.
+
+Попробовал увеличить колличество эпох до 100
+
+```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[System.Serializable]
+public class TrainingSet
+{
+	public double[] input;
+	public double output;
+}
+
+public class Perceptron : MonoBehaviour {
+
+	public TrainingSet[] ts;
+	double[] weights = {0,0};
+	double bias = 0;
+	double totalError = 0;
+
+	double DotProductBias(double[] v1, double[] v2) 
+	{
+		if (v1 == null || v2 == null)
+			return -1;
+	 
+		if (v1.Length != v2.Length)
+			return -1;
+	 
+		double d = 0;
+		for (int x = 0; x < v1.Length; x++)
+		{
+			d += v1[x] * v2[x];
+		}
+
+		d += bias;
+	 
+		return d;
+	}
+
+	double CalcOutput(int i)
+	{
+		double dp = DotProductBias(weights,ts[i].input);
+		if(dp > 0) return(1);
+		return (0);
+	}
+
+	void InitialiseWeights()
+	{
+		for(int i = 0; i < weights.Length; i++)
+		{
+			weights[i] = Random.Range(-1.0f,1.0f);
+		}
+		bias = Random.Range(-1.0f,1.0f);
+	}
+
+	void UpdateWeights(int j)
+	{
+		double error = ts[j].output - CalcOutput(j);
+		totalError += Mathf.Abs((float)error);
+		for(int i = 0; i < weights.Length; i++)
+		{			
+			weights[i] = weights[i] + error*ts[j].input[i]; 
+		}
+		bias += error;
+	}
+
+	double CalcOutput(double i1, double i2)
+	{
+		double[] inp = new double[] {i1, i2};
+		double dp = DotProductBias(weights,inp);
+		if(dp > 0) return(1);
+		return (0);
+	}
+
+	void Train(int epochs)
+	{
+		InitialiseWeights();
+		
+		for(int e = 0; e < epochs; e++)
+		{
+			totalError = 0;
+			for(int t = 0; t < ts.Length; t++)
+			{
+				UpdateWeights(t);
+				Debug.Log("W1: " + (weights[0]) + " W2: " + (weights[1]) + " B: " + bias);
+			}
+			Debug.Log("TOTAL ERROR: " + totalError);
+		}
+	}
+
+	void Start () {
+		Train(100);
+		Debug.Log("Test 0 0: " + CalcOutput(0,0));
+		Debug.Log("Test 0 1: " + CalcOutput(0,1));
+		Debug.Log("Test 1 0: " + CalcOutput(1,0));
+		Debug.Log("Test 1 1: " + CalcOutput(1,1));		
+	}
+	
+	void Update () {
+		
+	}
+}
+
+```
+
+![XOR 4 2(не учится)](https://user-images.githubusercontent.com/114404329/204628995-29a283c6-a585-461c-b876-a2c26658bdce.PNG)
+
+Перцептрон не обучился, не выдав правильного значение. Работает некорректно.
 
 ## Задание 2
 ### Пошагово выполнить каждый пункт раздела "ход работы" с описанием и примерами реализации задач
